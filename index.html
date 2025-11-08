@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#3b82f6" />
+    <script>
+      (function () {
+        "use strict";
+
+        // Inspector is always available when script is loaded
+        console.log("[Vibe Inspector] Script loaded and ready");
+
+        // Inspector state
+        let isInspectorActive = false;
+        let lastHighlightedElement = null;
+        let selectedElement = null;
+        let overlayElement = null;
+        let isInitialized = false;
+
+        // Create overlay element for highlighting
+        function createOverlay() {
+          if (overlayElement) return overlayElement;
+
+          overlayElement = document.createElement("div");
+          overlayElement.id = "__vibe-inspector-overlay__";
+          overlayElement.style.cssText = `
+      position: absolute;
+      pointer-events: none;
+      z-index: 999999;
+      border: 2px solid #007acc;
+      background: rgba(0, 122, 204, 0.1);
+      border-radius: 2px;
+      transition: all 0.1s ease;
+      display: none;
+    `;
+          document.body.appendChild(overlayElement);
+          return overlayElement;
+        }
+
+        // Remove overlay element
+        function removeOverlay() {
+          if (overlayElement && overlayElement.parentNode) {
+            overlayElement.parentNode.removeChild(overlayElement);
+            overlayElement = null;
+          }
+        }
+
+        // Generate CSS selector for element
+        function generateSelector(element) {
+          if (!element || element === document.body) return "body";
+          if (element === document.documentElement) return "html";
+
+          // If element has unique ID, use that
+          if (
+            element.id &&
+            document.querySelectorAll("#" + element.id).length === 1
+          ) {
+            return "#" + element.id;
+          }
+
+          // Build path from root
+          const path = [];
+          let current = element;
+
+          while (
+            current &&
+            current !== document.body &&
+            current !== document.documentElement
+          ) {
+            let selector = current.tagName.toLowerCase();
+
+            // Add class if available
+            if (current.className && typeof current.className === "string") {
+              const classes = current.className
+                .trim()
+                .split(/\s+/)
+                .filter((cls) => cls && /^[a-zA-Z_-][a-zA-Z0-9_-]*$/.test(cls));
+              if (classes.length > 0) {
+                selector += "." + classes.slice(0, 3).join(".");
+              }
+            }
+
+            // Add nth-child if there are siblings with same tag
+            if (current.parentNode) {
+              const siblings = Array.from(current.parentNode.children).filter(
+                (sibling) => sibling.tagName === current.tagName
+              );
+
+              if (siblings.length > 1) {
+                const index = siblings.indexOf(current) + 1;
+                selector += `:nth-child(${index})`;
+              }
+            }
+
+            path.unshift(selector);
+            current = current.parentNode;
+          }
+
+          return path.length > 0
+            ? path.join(" > ")
+            : element.tagName.toLowerCase();
+        }
+
+        // Extract element data
+        function extractElementData(element) {
+          if (!element) return null;
+
+          const computedStyles = window.getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+
+          // Get important computed styles
+          const importantStyles = [
+            "display",
+            "position",
+            "width",
+            "height",
+            "margin",
+            "padding",
+            "background-color",
+            "color",
+            "font-family",
+            "font-size",
+            "border",
+            "flex-direction",
+            "justify-content",
+            "align-items",
+            "z-index",
+          ];
+
+          const styles = {};
+          importantStyles.forEach((prop) => {
+            const value = computedStyles.getPropertyValue(prop);
+            if (
+              value &&
+              value !== "auto" &&
+              value !== "none" &&
+              value !== "rgba(0, 0, 0, 0)"
+            ) {
+              styles[prop] = value;
+            }
+          });
+
+          // Get attributes
+          const attributes = {};
+          for (let i = 0; i < element.attributes.length; i++) {
+            const attr = element.attributes[i];
+            attributes[attr.name] = attr.value;
+          }
+
+          // Get text content (limited)
+          const textContent = element.textContent || "";
+          const cleanTextContent = textContent.replace(/\s+/g, " ").trim();
+
+          // Get innerHTML (limited and cleaned)
+          const innerHTML = element.innerHTML || "";
+          const cleanInnerHTML =
+            innerHTML.length > 500
+              ? innerHTML.substring(0, 500) + "..."
+              : innerHTML;
+
+          return {
+            selector: generateSelector(element),
+            tagName: element.tagName.toLowerCase(),
+            id: element.id || undefined,
+            className: element.className || undefined,
+            attributes: attributes,
+            textContent:
+              cleanTextContent.length > 200
+                ? cleanTextContent.substring(0, 200) + "..."
+                : cleanTextContent,
+            innerHTML: cleanInnerHTML,
+            computedStyles: styles,
+            boundingRect: {
+              top: rect.top + window.scrollY,
+              left: rect.left + window.scrollX,
+              width: rect.width,
+              height: rect.height,
+            },
+            parentSelector: element.parentElement
+              ? generateSelector(element.parentElement)
+              : undefined,
+            siblingCount: element.parentElement
+              ? element.parentElement.children.length
+              : 0,
+            childrenCount: element.children.length,
+          };
+        }
+
+        // Position overlay over element
+        function positionOverlay(element) {
+          if (!overlayElement || !element) return;
+
+          const rect = element.getBoundingClientRect();
+          const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+          const scrollLeft =
+            window.pageXOffset || document.documentElement.scrollLeft;
+
+          overlayElement.style.top = rect.top + scrollTop + "px";
+          overlayElement.style.left = rect.left + scrollLeft + "px";
+          overlayElement.style.width = rect.width + "px";
+          overlayElement.style.height = rect.height + "px";
+          overlayElement.style.display = "block";
+        }
+
+        // Hide overlay
+        function hideOverlay() {
+          if (overlayElement) {
+            overlayElement.style.display = "none";
+          }
+        }
+
+        // Handle mouse over
+        function handleMouseOver(event) {
+          if (!isInspectorActive) return;
+
+          // Ignore inspector overlay itself
+          if (
+            event.target === overlayElement ||
+            event.target.id === "__vibe-inspector-overlay__"
+          ) {
+            return;
+          }
+
+          const element = event.target;
+          if (
+            element &&
+            element !== lastHighlightedElement &&
+            element !== document.body &&
+            element !== document.documentElement
+          ) {
+            lastHighlightedElement = element;
+            createOverlay();
+            positionOverlay(element);
+
+            // Change style for hover
+            overlayElement.style.border = "2px solid #007acc";
+            overlayElement.style.background = "rgba(0, 122, 204, 0.1)";
+          }
+        }
+
+        // Handle click for selection
+        function handleClick(event) {
+          if (!isInspectorActive) return;
+
+          // Ignore inspector overlay itself
+          if (
+            event.target === overlayElement ||
+            event.target.id === "__vibe-inspector-overlay__"
+          ) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          const element = event.target;
+
+          // Don't select body or html
+          if (
+            element === document.body ||
+            element === document.documentElement
+          ) {
+            return;
+          }
+
+          selectedElement = element;
+          console.log("[Vibe Inspector] Element selected:", element);
+
+          // Update overlay style for selection
+          if (overlayElement) {
+            overlayElement.style.border = "2px solid #ff6b35";
+            overlayElement.style.background = "rgba(255, 107, 53, 0.1)";
+          }
+
+          // Send element data to parent
+          const elementData = extractElementData(element);
+          if (elementData && window.parent) {
+            try {
+              window.parent.postMessage(
+                {
+                  type: "ELEMENT_SELECTED",
+                  elementData: elementData,
+                },
+                "*"
+              );
+              console.log(
+                "[Vibe Inspector] Element data sent to parent:",
+                elementData
+              );
+            } catch (error) {
+              console.error(
+                "[Vibe Inspector] Failed to send element data:",
+                error
+              );
+            }
+          }
+        }
+
+        // Prevent default behaviors during inspection
+        function preventDefault(event) {
+          if (isInspectorActive) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }
+
+        // Activate inspector
+        function activateInspector() {
+          if (isInspectorActive) return;
+
+          console.log("[Vibe Inspector] Activating inspector");
+          isInspectorActive = true;
+          document.body.style.cursor = "crosshair";
+
+          // Add event listeners
+          document.addEventListener("mouseover", handleMouseOver, true);
+          document.addEventListener("click", handleClick, true);
+          document.addEventListener("selectstart", preventDefault, true);
+          document.addEventListener("contextmenu", preventDefault, true);
+
+          // Add visual indicator
+          if (!document.getElementById("__vibe-inspector-indicator__")) {
+            const indicator = document.createElement("div");
+            indicator.id = "__vibe-inspector-indicator__";
+            indicator.innerHTML =
+              "🎯 Inspector Active - Hover to highlight, click to select";
+            indicator.style.cssText = `
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #007acc;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        z-index: 1000000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        pointer-events: none;
+      `;
+            document.body.appendChild(indicator);
+          }
+        }
+
+        // Deactivate inspector
+        function deactivateInspector() {
+          if (!isInspectorActive) return;
+
+          console.log("[Vibe Inspector] Deactivating inspector");
+          isInspectorActive = false;
+          document.body.style.cursor = "";
+
+          // Remove event listeners
+          document.removeEventListener("mouseover", handleMouseOver, true);
+          document.removeEventListener("click", handleClick, true);
+          document.removeEventListener("selectstart", preventDefault, true);
+          document.removeEventListener("contextmenu", preventDefault, true);
+
+          // Clean up
+          hideOverlay();
+          removeOverlay();
+          lastHighlightedElement = null;
+          selectedElement = null;
+
+          // Remove indicator
+          const indicator = document.getElementById(
+            "__vibe-inspector-indicator__"
+          );
+          if (indicator) {
+            indicator.remove();
+          }
+        }
+
+        // Initialize inspector functionality
+        function initializeInspector() {
+          if (isInitialized) return;
+          isInitialized = true;
+
+          // Listen for messages from parent window
+          window.addEventListener("message", function (event) {
+            // Basic security - could be enhanced to check event.origin
+            if (event.data && typeof event.data.type === "string") {
+              switch (event.data.type) {
+                case "ACTIVATE_INSPECTOR":
+                  activateInspector();
+                  break;
+                case "DEACTIVATE_INSPECTOR":
+                  deactivateInspector();
+                  break;
+              }
+            }
+          });
+
+          // Cleanup on page unload
+          window.addEventListener("beforeunload", deactivateInspector);
+
+          // Send ready message to parent
+          if (window.parent) {
+            try {
+              window.parent.postMessage(
+                {
+                  type: "INSPECTOR_READY",
+                  url: window.location.href,
+                },
+                "*"
+              );
+              console.log("[Vibe Inspector] Ready message sent to parent");
+            } catch (error) {
+              console.error(
+                "[Vibe Inspector] Failed to send ready message:",
+                error
+              );
+            }
+          }
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initializeInspector);
+        } else {
+          initializeInspector();
+        }
+      })();
+    </script>
+    <title>2048 - Mobile Touch Game</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
