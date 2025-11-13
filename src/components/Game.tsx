@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { GameBoard } from './GameBoard';
+import { useState, useEffect, useRef } from 'react';
+import { GameBoard, BOARD_GAP } from './GameBoard';
 import { ScoreBoard } from './ScoreBoard';
 import { GameControls } from './GameControls';
 import { GameModal } from './GameModal';
@@ -9,6 +9,7 @@ import { useGameState } from '../hooks/useGameState';
 import { useKeyboard } from '../hooks/useKeyboard';
 import { useTouch } from '../hooks/useTouch';
 import { useResponsive } from '../hooks/useResponsive';
+import { GRID_SIZE } from '../utils/gameLogic';
 
 interface ParticleInstance {
   id: string;
@@ -28,22 +29,33 @@ export const Game: React.FC = () => {
     scoreIncrease
   } = useGameState();
 
-  const { isMobile, deviceInfo } = useResponsive();
+  const { isMobile, deviceInfo, containerSize } = useResponsive();
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const gap = BOARD_GAP;
+  const tileSize = Math.floor((containerSize - (GRID_SIZE + 1) * gap) / GRID_SIZE);
   const [particles, setParticles] = useState<ParticleInstance[]>([]);
 
   // Handle particle effects for merges
   useEffect(() => {
-    if (animatingTiles.length > 0) {
-      const newParticles = animatingTiles.map(tile => ({
+    if (!animatingTiles.length) return;
+
+    const boardRect = boardRef.current?.getBoundingClientRect();
+    if (!boardRect || tileSize <= 0) return;
+
+    const newParticles = animatingTiles.map(tile => {
+      const centerX = boardRect.left + gap + tile.col * (tileSize + gap) + tileSize / 2;
+      const centerY = boardRect.top + gap + tile.row * (tileSize + gap) + tileSize / 2;
+
+      return {
         id: `${tile.id}-${Date.now()}`,
-        x: (tile.col * 100) + 200, // Approximate position
-        y: (tile.row * 100) + 200,
+        x: centerX,
+        y: centerY,
         color: tile.value >= 1024 ? '#fbbf24' : tile.value >= 256 ? '#f59e0b' : '#fb923c'
-      }));
-      
-      setParticles(prev => [...prev, ...newParticles]);
-    }
-  }, [animatingTiles]);
+      };
+    });
+
+    setParticles(prev => [...prev, ...newParticles]);
+  }, [animatingTiles, gap, tileSize]);
 
   const removeParticle = (id: string) => {
     setParticles(prev => prev.filter(p => p.id !== id));
@@ -83,47 +95,36 @@ export const Game: React.FC = () => {
   }, [isMobile, deviceInfo.isTouchDevice]);
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center ${
-      isMobile ? 'p-2' : 'p-4'
-    }`}>
-      <div className={`w-full ${isMobile ? 'max-w-sm' : 'max-w-md'}`}>
-        {/* Header with Theme Toggle */}
-        <div className={`text-center ${isMobile ? 'mb-4' : 'mb-8'} relative`}>
-          {/* Theme Toggle Button - positioned in top right */}
-          <div className="absolute top-0 right-0">
-            <ThemeToggle />
+    <div
+      className={`ambient-bg min-h-screen transition-all duration-500 flex flex-col items-center justify-center relative ${
+        isMobile ? "p-3 pt-6 pb-[260px]" : "p-10 pt-16 pb-40"
+      }
+      }`}
+    >
+      <div className={`w-full relative z-10 px-0 md:px-4`}>
+        {/* Game description */}
+        <section className="absolute top-4 left-4 max-w-sm">
+          <div className="relative rounded-[32px] border-2 border-pop-coal bg-pop-blush text-pop-coal px-6 py-6 shadow-[10px_10px_0_rgba(17,17,17,0.25)] dark:bg-clay-950 dark:text-white">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.4em]">
+                  Daily brain gym
+                </p>
+                <h1
+                  className={`${
+                    isMobile ? "text-4xl" : "text-[56px]"
+                  } font-serif leading-none mt-2`}
+                >
+                  Witty tiles, tiny victories.
+                </h1>
+              </div>
+            </div>
+            <p className="mt-4 text-base md:text-lg font-semibold">
+              Swipe like you mean it. Merge twins. Roast your high score in the
+              group chat.
+            </p>
           </div>
-          
-          <h1 className={`${isMobile ? 'text-4xl' : 'text-5xl'} font-bold text-gray-800 dark:text-gray-100 mb-2 transition-colors duration-300`}>2048</h1>
-          <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
-            Join the tiles, get to <strong>2048!</strong>
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 transition-colors duration-300">
-            <span className="hidden sm:inline">Use arrow keys or </span>
-            <span className="sm:hidden">Swipe or use arrow keys to move tiles</span>
-            <span className="hidden sm:inline">swipe to move tiles</span>
-          </p>
-        </div>
-
-        {/* Score Board */}
-        <div className="flex justify-center">
-          <ScoreBoard 
-            score={gameState.score}
-            bestScore={gameState.bestScore}
-            scoreIncrease={scoreIncrease}
-          />
-        </div>
-
-        {/* Game Controls */}
-        <div className="flex justify-center">
-          <GameControls
-            onRestart={restartGame}
-            onUndo={undoMove}
-            canUndo={gameState.canUndo}
-          />
-        </div>
-
-        {/* Game Board */}
+        </section>
         <GameBoard
           board={gameState.board}
           onTouchStart={touchHandlers.onTouchStart}
@@ -133,38 +134,35 @@ export const Game: React.FC = () => {
           onContextMenu={touchHandlers.onContextMenu}
           isSwipeActive={touchHandlers.isSwipeActive}
           touchDirection={touchHandlers.touchState.direction}
+          boardRef={boardRef}
         />
+      </div>
 
-        {/* Instructions */}
-        <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300" role="region" aria-label="Game instructions">
-          <p className="mb-2">
-            <strong>HOW TO PLAY:</strong> 
-            <span className="hidden sm:inline"> Use your arrow keys to move the tiles.</span>
-            <span className="sm:hidden"> Swipe in any direction to move the tiles.</span>
-          </p>
-          <p className="mb-2">
-            When two tiles with the same number touch, they merge into one!
-          </p>
-          <p className="hidden sm:block">
-            <strong>Keyboard shortcuts:</strong> Ctrl+R (restart), Ctrl+Z (undo)
-          </p>
-          <p className="sm:hidden">
-            <strong>Touch controls:</strong> Swipe to move, tap buttons to restart/undo
-          </p>
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-[min(90vw,420px)] pointer-events-auto">
+        <div className="flex items-center justify-between gap-3 px-4 py-4">
+            <ScoreBoard
+              score={gameState.score}
+              bestScore={gameState.bestScore}
+              scoreIncrease={scoreIncrease}
+            />
+            <GameControls
+              onRestart={restartGame}
+              onUndo={undoMove}
+              canUndo={gameState.canUndo}
+            />
         </div>
       </div>
 
-      {/* Game Modal */}
       <GameModal
         gameStatus={gameState.gameStatus}
         score={gameState.score}
         bestScore={gameState.bestScore}
         onRestart={restartGame}
-        onContinue={gameState.gameStatus === 'won' ? continueGame : undefined}
+        onContinue={gameState.gameStatus === "won" ? continueGame : undefined}
       />
 
       {/* Particle Effects */}
-      {particles.map(particle => (
+      {particles.map((particle) => (
         <ParticleEffect
           key={particle.id}
           x={particle.x}

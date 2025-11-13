@@ -10,7 +10,7 @@ interface GameControlsProps {
 export const GameControls: React.FC<GameControlsProps> = ({ 
   onRestart, 
   onUndo, 
-  canUndo 
+  canUndo
 }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -31,39 +31,27 @@ export const GameControls: React.FC<GameControlsProps> = ({
     }
   };
 
+  const baseButton = 'px-5 py-3 rounded-2xl border-2 border-pop-coal dark:border-white/80 shadow-[6px_6px_0_rgba(17,17,17,0.35)] flex-1 min-w-[140px]';
+
   return (
-    <div className="flex gap-3 mb-6">
+    <div className="flex gap-3 flex-wrap">
       <button
         onClick={handleRestart}
-        className={`
-          flex items-center gap-2 px-4 py-2 rounded-lg font-semibold
-          transition-all duration-300 transform hover:scale-105 shadow-md
-          ${showConfirm 
-            ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white shadow-red-200 dark:shadow-red-900/30' 
-            : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 shadow-gray-200 dark:shadow-gray-900/30'
-          }
-        `}
+        className={`flex items-center justify-center gap-2 font-semibold text-sm md:text-base transition-all duration-300 active:translate-y-0.5 ${baseButton} ${showConfirm ? 'bg-pop-lemon dark:bg-pop-coal text-pop-coal dark:text-white animate-gentle-pulse' : 'bg-white dark:bg-clay-900'}`}
         aria-label={showConfirm ? 'Confirm restart' : 'Restart game'}
       >
-        <RotateCcw size={18} />
-        {showConfirm ? 'Confirm?' : 'Restart'}
+        <RotateCcw size={18} className={showConfirm ? 'animate-spin' : ''} style={{ animationDuration: showConfirm ? '1s' : undefined }} />
+        <span>{showConfirm ? 'Sure?' : 'Do Over'}</span>
       </button>
-      
+
       <button
         onClick={handleUndo}
         disabled={!canUndo}
-        className={`
-          flex items-center gap-2 px-4 py-2 rounded-lg font-semibold
-          transition-all duration-300 transform shadow-md
-          ${canUndo 
-            ? 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white hover:scale-105 shadow-blue-200 dark:shadow-blue-900/30' 
-            : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed shadow-gray-200 dark:shadow-gray-900/30'
-          }
-        `}
+        className={`flex items-center justify-center gap-2 font-semibold text-sm md:text-base transition-all duration-300 ${baseButton} ${canUndo ? 'bg-pop-sky text-pop-coal dark:text-pop-coal' : 'bg-pop-lilac text-pop-coal/40 dark:text-white/30 cursor-not-allowed'}`}
         aria-label="Undo last move"
       >
         <Undo2 size={18} />
-        Undo
+        <span>Undo</span>
       </button>
     </div>
   );

@@ -7,25 +7,20 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="
-        relative p-3 rounded-full transition-all duration-300 ease-in-out
-        bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600
-        border-2 border-gray-300 dark:border-gray-600
-        shadow-lg hover:shadow-xl
-        transform hover:scale-105 active:scale-95
-        focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800
-      "
-      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      className="flex items-center justify-center
+        w-11 h-11 rounded-full border-2 border-pop-coal dark:border-white/80 bg-white dark:bg-clay-900 text-pop-coal dark:text-white shadow-[4px_4px_0_rgba(17,17,17,0.35)]"
+      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
-      <div className="relative w-6 h-6">
+      <div className="relative w-5 h-5">
         {/* Sun Icon */}
         <svg
           className={`
-            absolute inset-0 w-6 h-6 text-yellow-500 transition-all duration-300 ease-in-out
-            ${theme === 'light' 
-              ? 'opacity-100 rotate-0 scale-100' 
-              : 'opacity-0 rotate-90 scale-75'
+            absolute inset-0 w-5 h-5 text-pop-coal dark:text-pop-coal transition-all duration-500 ease-out
+            ${
+              theme === "light"
+                ? "opacity-100 rotate-0 scale-100"
+                : "opacity-0 rotate-90 scale-75"
             }
           `}
           fill="currentColor"
@@ -42,19 +37,18 @@ export const ThemeToggle: React.FC = () => {
         {/* Moon Icon */}
         <svg
           className={`
-            absolute inset-0 w-6 h-6 text-blue-400 transition-all duration-300 ease-in-out
-            ${theme === 'dark' 
-              ? 'opacity-100 rotate-0 scale-100' 
-              : 'opacity-0 -rotate-90 scale-75'
+            absolute inset-0 w-5 h-5 text-sand-300 dark:text-sand-200 transition-all duration-500 ease-out
+            ${
+              theme === "dark"
+                ? "opacity-100 rotate-0 scale-100"
+                : "opacity-0 -rotate-90 scale-75"
             }
           `}
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
-          />
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
         </svg>
       </div>
     </button>

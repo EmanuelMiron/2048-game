@@ -8,65 +8,137 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Custom colors for better dark mode support
+        // Soft Momentum Palette - Warm neutrals with depth
+        cream: {
+          50: '#fdfcfa',
+          100: '#f9f7f4',
+          200: '#f3efe8',
+          300: '#e8e2d7',
+          400: '#d9cfc0',
+        },
+        sand: {
+          50: '#faf8f5',
+          100: '#f0ebe3',
+          200: '#e4dccf',
+          300: '#cfc5b5',
+          400: '#b8ab98',
+          500: '#9d8f7c',
+        },
+        terracotta: {
+          50: '#fdf6f3',
+          100: '#fae8e0',
+          200: '#f5d0bf',
+          300: '#ebb191',
+          400: '#de8f68',
+          500: '#c97854',
+          600: '#b06644',
+          700: '#8f5235',
+          800: '#733f2a',
+          900: '#5a301f',
+          950: '#3d1f14',
+          1000: '#2a150d',
+        },
+        clay: {
+          50: '#f8f6f4',
+          100: '#ebe6e1',
+          200: '#d9cfc4',
+          300: '#c2b3a3',
+          400: '#a89481',
+          500: '#8a7461',
+          600: '#6f5b4a',
+          700: '#594537',
+          800: '#44322a',
+          900: '#3d3731',
+          950: '#2a2622',
+          1000: '#1a1612',
+        },
+        pop: {
+          blush: '#fee4eb',
+          lemon: '#fff7be',
+          sky: '#d9f0ff',
+          lilac: '#ede2ff',
+          mint: '#dbf6e2',
+          coal: '#111111',
+          ink: '#1f1f1f'
+        },
+        // Tile colors with physical depth
         'tile-empty': {
           light: '#cdc1b4',
-          dark: '#3a3a3c'
+          dark: '#1f1b16'
         },
         'tile-2': {
-          light: '#eee4da',
-          dark: '#48484a'
+          light: '#fee4eb',
+          dark: '#46343c'
         },
         'tile-4': {
-          light: '#ede0c8',
-          dark: '#5a5a5c'
+          light: '#fff2d2',
+          dark: '#4f3c31'
         },
         'tile-8': {
-          light: '#f2b179',
-          dark: '#ff9500'
+          light: '#ffd39b',
+          dark: '#9c4119'
         },
         'tile-16': {
-          light: '#f59563',
-          dark: '#ff8c00'
+          light: '#ffb66f',
+          dark: '#b84418'
         },
         'tile-32': {
-          light: '#f67c5f',
-          dark: '#ff7b00'
+          light: '#ff9a6d',
+          dark: '#a3311a'
         },
         'tile-64': {
-          light: '#f65e3b',
-          dark: '#ff6b00'
+          light: '#ff7a63',
+          dark: '#8c201a'
         },
         'tile-128': {
-          light: '#edcf72',
-          dark: '#ffd60a'
+          light: '#ffd657',
+          dark: '#a66211'
         },
         'tile-256': {
-          light: '#edcc61',
-          dark: '#ffcc02'
+          light: '#ffc946',
+          dark: '#94540e'
         },
         'tile-512': {
-          light: '#edc850',
-          dark: '#ffb700'
+          light: '#ffbf34',
+          dark: '#7d430b'
         },
         'tile-1024': {
-          light: '#edc53f',
-          dark: '#ff9500'
+          light: '#ffb31e',
+          dark: '#6a3608'
         },
         'tile-2048': {
-          light: '#edc22e',
-          dark: '#ff8500'
+          light: '#ffe79c',
+          dark: '#4f2b06'
         },
         'tile-super': {
-          light: '#3c3a32',
-          dark: '#ff6b35'
-        }
+          light: '#1d1d1d',
+          dark: '#faf2e1'
+        },
+      },
+      fontFamily: {
+        serif: ['"Righteous"', 'Georgia', 'serif'],
+        sans: ['"Source Sans 3"', '"Inter"', 'system-ui', 'sans-serif']
+      },
+      boxShadow: {
+        'soft': '0 2px 8px -2px rgba(138, 116, 97, 0.15), 0 4px 16px -4px rgba(138, 116, 97, 0.08)',
+        'soft-lg': '0 4px 16px -4px rgba(138, 116, 97, 0.2), 0 8px 32px -8px rgba(138, 116, 97, 0.12)',
+        'inner-soft': 'inset 0 2px 4px 0 rgba(138, 116, 97, 0.1)',
+        // Faux-3D tile shadows - layered for depth
+        'tile-3d': '0 1px 0 0 rgba(255, 255, 255, 0.3), 0 2px 0 0 rgba(0, 0, 0, 0.05), 0 3px 2px -1px rgba(138, 116, 97, 0.15), 0 6px 8px -2px rgba(138, 116, 97, 0.08)',
+        'tile-3d-low': '0 1px 0 0 rgba(255, 255, 255, 0.2), 0 1px 1px 0 rgba(138, 116, 97, 0.1)',
+        'tile-3d-mid': '0 1px 0 0 rgba(255, 255, 255, 0.3), 0 3px 0 0 rgba(0, 0, 0, 0.06), 0 4px 4px -2px rgba(138, 116, 97, 0.2), 0 8px 12px -3px rgba(138, 116, 97, 0.12)',
+        'tile-3d-high': '0 2px 0 0 rgba(255, 255, 255, 0.35), 0 4px 0 0 rgba(0, 0, 0, 0.08), 0 6px 6px -2px rgba(138, 116, 97, 0.25), 0 10px 16px -4px rgba(138, 116, 97, 0.15)',
+        'tile-inner-bevel': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 0 rgba(0, 0, 0, 0.1)',
       },
       transitionProperty: {
         'colors': 'color, background-color, border-color, text-decoration-color, fill, stroke',
       },
       transitionDuration: {
         '300': '300ms',
+      },
+      transitionTimingFunction: {
+        'soft': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'bounce-soft': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       }
     },
   },

@@ -45,10 +45,10 @@ export const useResponsive = () => {
   
   // Calculate optimal container size based on device and screen
   const getContainerSize = () => {
-    const padding = isMobile ? 16 : 32;
-    const maxSize = isMobile ? 360 : 400;
+    const padding = isMobile ? 16 : 48;
+    const maxSize = isMobile ? 400 : isTablet ? 440 : 520;
     const availableWidth = windowSize.width - padding;
-    const availableHeight = windowSize.height - (isMobile ? 200 : 300); // Account for UI elements
+    const availableHeight = windowSize.height - (isMobile ? 200 : 320); // Account for UI elements
     
     return Math.min(maxSize, availableWidth, availableHeight);
   };

@@ -276,21 +276,22 @@ export const hasWon = (board: (Tile | null)[][]): boolean => {
 
 // Get tile color based on value with dark mode support
 export const getTileColor = (value: number): string => {
+  const base = 'transition-colors duration-300';
   const colors: { [key: number]: string } = {
-    2: 'bg-tile-2-light dark:bg-tile-2-dark text-gray-800 dark:text-gray-200 transition-colors duration-300',
-    4: 'bg-tile-4-light dark:bg-tile-4-dark text-gray-800 dark:text-gray-200 transition-colors duration-300',
-    8: 'bg-tile-8-light dark:bg-tile-8-dark text-white transition-colors duration-300',
-    16: 'bg-tile-16-light dark:bg-tile-16-dark text-white transition-colors duration-300',
-    32: 'bg-tile-32-light dark:bg-tile-32-dark text-white transition-colors duration-300',
-    64: 'bg-tile-64-light dark:bg-tile-64-dark text-white transition-colors duration-300',
-    128: 'bg-tile-128-light dark:bg-tile-128-dark text-white transition-colors duration-300',
-    256: 'bg-tile-256-light dark:bg-tile-256-dark text-white transition-colors duration-300',
-    512: 'bg-tile-512-light dark:bg-tile-512-dark text-white transition-colors duration-300',
-    1024: 'bg-tile-1024-light dark:bg-tile-1024-dark text-white transition-colors duration-300',
-    2048: 'bg-tile-2048-light dark:bg-tile-2048-dark text-white transition-colors duration-300',
+    2: `bg-tile-2-light dark:bg-tile-2-dark ${base}`,
+    4: `bg-tile-4-light dark:bg-tile-4-dark ${base}`,
+    8: `bg-tile-8-light dark:bg-tile-8-dark ${base}`,
+    16: `bg-tile-16-light dark:bg-tile-16-dark ${base}`,
+    32: `bg-tile-32-light dark:bg-tile-32-dark ${base}`,
+    64: `bg-tile-64-light dark:bg-tile-64-dark ${base}`,
+    128: `bg-tile-128-light dark:bg-tile-128-dark ${base}`,
+    256: `bg-tile-256-light dark:bg-tile-256-dark ${base}`,
+    512: `bg-tile-512-light dark:bg-tile-512-dark ${base}`,
+    1024: `bg-tile-1024-light dark:bg-tile-1024-dark ${base}`,
+    2048: `bg-tile-2048-light dark:bg-tile-2048-dark ${base}`,
   };
-  
-  return colors[value] || 'bg-tile-super-light dark:bg-tile-super-dark text-white transition-colors duration-300';
+
+  return colors[value] || `bg-tile-super-light dark:bg-tile-super-dark ${base}`;
 };
 
 // Format score with commas
