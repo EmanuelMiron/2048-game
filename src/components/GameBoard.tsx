@@ -41,7 +41,7 @@ export const GameBoard = ({
       gridCells.push(
         <div
           key={`${row}-${col}`}
-          className="absolute rounded-2xl transition-all duration-500 bg-pop-blush/70 dark:bg-clay-800"
+          className="absolute rounded-2xl transition-all duration-500 bg-pop-blush/70 dark:bg-[#3a3a4e]"
           style={{
             left: `${col * (tileSize + gap) + gap}px`,
             top: `${row * (tileSize + gap) + gap}px`,
@@ -76,7 +76,7 @@ export const GameBoard = ({
     <div className="flex flex-col items-center">
       <div
         ref={boardRef}
-        className={`relative rounded-[32px] border-4 border-pop-coal dark:border-white/60 p-3 touch-none select-none transition-all duration-500 bg-pop-sky/80 dark:bg-clay-900/80 shadow-[12px_12px_0_rgba(17,17,17,0.2)] ${
+        className={`relative rounded-[32px] border-4 border-pop-coal dark:border-[#1a1a2e] p-3 touch-none select-none transition-all duration-500 bg-pop-sky/80 dark:bg-[#2a2a3e] shadow-[12px_12px_0_rgba(17,17,17,0.2)] dark:shadow-[12px_12px_0_rgba(0,0,0,0.4)] ${
           isSwipeActive ? 'scale-[1.01]' : ''
         }`}
         style={{

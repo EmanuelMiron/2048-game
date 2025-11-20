@@ -22,7 +22,6 @@ export const Game: React.FC = () => {
   const {
     gameState,
     makeMove,
-    undoMove,
     restartGame,
     continueGame,
     animatingTiles,
@@ -65,7 +64,6 @@ export const Game: React.FC = () => {
   useKeyboard({
     onMove: makeMove,
     onRestart: restartGame,
-    onUndo: undoMove,
     disabled: gameState.gameStatus !== 'playing'
   });
 
@@ -96,60 +94,73 @@ export const Game: React.FC = () => {
 
   return (
     <div
-      className={`ambient-bg min-h-screen transition-all duration-500 flex flex-col items-center justify-center relative ${
-        isMobile ? "p-3 pt-6 pb-[260px]" : "p-10 pt-16 pb-40"
+      className={`ambient-bg min-h-screen transition-all duration-500 flex items-center justify-center relative ${
+        isMobile ? "p-3 pt-6 pb-[160px]" : "p-10 pb-32"
       }
       }`}
     >
-      <div className={`w-full relative z-10 px-0 md:px-4`}>
-        {/* Game description */}
-        <section className="absolute top-4 left-4 max-w-sm">
-          <div className="relative rounded-[32px] border-2 border-pop-coal bg-pop-blush text-pop-coal px-6 py-6 shadow-[10px_10px_0_rgba(17,17,17,0.25)] dark:bg-clay-950 dark:text-white">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.4em]">
-                  Daily brain gym
-                </p>
-                <h1
-                  className={`${
-                    isMobile ? "text-4xl" : "text-[56px]"
-                  } font-serif leading-none mt-2`}
-                >
-                  Witty tiles, tiny victories.
-                </h1>
+      {/* Main content: centered layout */}
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="flex flex-col items-center justify-center gap-8">
+          {/* Game description */}
+          <section className="w-full max-w-2xl">
+            <div className="relative rounded-[32px] border-2 border-pop-coal bg-pop-blush text-pop-coal px-6 py-6 shadow-[10px_10px_0_rgba(17,17,17,0.25)] dark:bg-[#A8E6CF] dark:text-[#1a1a2e] dark:border-[#1a1a2e] dark:shadow-[10px_10px_0_rgba(0,0,0,0.3)] transition-all duration-500">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.4em]">
+                    Daily brain gym
+                  </p>
+                  <h1
+                    className={`${
+                      isMobile ? "text-4xl" : "text-5xl"
+                    } font-serif leading-none mt-2`}
+                  >
+                    Witty tiles, tiny victories.
+                  </h1>
+                </div>
               </div>
+              <p className="mt-4 text-base md:text-lg font-semibold">
+                Swipe like you mean it. Merge twins. Roast your high score in the
+                group chat.
+              </p>
             </div>
-            <p className="mt-4 text-base md:text-lg font-semibold">
-              Swipe like you mean it. Merge twins. Roast your high score in the
-              group chat.
-            </p>
+          </section>
+
+          {/* Game board */}
+          <div className="flex-shrink-0">
+            <GameBoard
+              board={gameState.board}
+              onTouchStart={touchHandlers.onTouchStart}
+              onTouchEnd={touchHandlers.onTouchEnd}
+              onTouchMove={touchHandlers.onTouchMove}
+              onTouchCancel={touchHandlers.onTouchCancel}
+              onContextMenu={touchHandlers.onContextMenu}
+              isSwipeActive={touchHandlers.isSwipeActive}
+              touchDirection={touchHandlers.touchState.direction}
+              boardRef={boardRef}
+            />
           </div>
-        </section>
-        <GameBoard
-          board={gameState.board}
-          onTouchStart={touchHandlers.onTouchStart}
-          onTouchEnd={touchHandlers.onTouchEnd}
-          onTouchMove={touchHandlers.onTouchMove}
-          onTouchCancel={touchHandlers.onTouchCancel}
-          onContextMenu={touchHandlers.onContextMenu}
-          isSwipeActive={touchHandlers.isSwipeActive}
-          touchDirection={touchHandlers.touchState.direction}
-          boardRef={boardRef}
-        />
+        </div>
       </div>
 
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-[min(90vw,420px)] pointer-events-auto">
-        <div className="flex items-center justify-between gap-3 px-4 py-4">
+      {/* Fixed footer with controls */}
+      <div className="fixed bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-30 w-[min(98vw,600px)] pointer-events-auto">
+        <div className="flex flex-row gap-1.5 sm:gap-3 px-2 sm:px-4 py-2 sm:py-4 items-stretch justify-center">
+          <div className="flex-1 max-w-xs min-w-0">
             <ScoreBoard
               score={gameState.score}
               bestScore={gameState.bestScore}
               scoreIncrease={scoreIncrease}
+              compact={isMobile}
             />
+          </div>
+          <div className="flex items-stretch gap-1.5 sm:gap-3">
             <GameControls
               onRestart={restartGame}
-              onUndo={undoMove}
-              canUndo={gameState.canUndo}
+              compact={isMobile}
             />
+            <ThemeToggle compact={isMobile} />
+          </div>
         </div>
       </div>
 

@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { RotateCcw, Undo2 } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
 interface GameControlsProps {
   onRestart: () => void;
-  onUndo: () => void;
-  canUndo: boolean;
+  compact?: boolean;
 }
 
-export const GameControls: React.FC<GameControlsProps> = ({ 
-  onRestart, 
-  onUndo, 
-  canUndo
+export const GameControls: React.FC<GameControlsProps> = ({
+  onRestart,
+  compact = false
 }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -25,34 +23,21 @@ export const GameControls: React.FC<GameControlsProps> = ({
     }
   };
 
-  const handleUndo = () => {
-    if (canUndo) {
-      onUndo();
-    }
-  };
-
-  const baseButton = 'px-5 py-3 rounded-2xl border-2 border-pop-coal dark:border-white/80 shadow-[6px_6px_0_rgba(17,17,17,0.35)] flex-1 min-w-[140px]';
+  const iconSize = compact ? 16 : 20;
+  const labelSize = compact ? 'text-[8px]' : 'text-xs';
+  const gap = compact ? 'gap-0.5' : 'gap-1';
+  const padding = compact ? 'px-3 py-2' : 'px-6 py-3';
+  const borderRadius = compact ? 'rounded-xl' : 'rounded-2xl';
+  const shadow = compact ? 'shadow-[3px_3px_0_rgba(17,17,17,0.35)]' : 'shadow-[6px_6px_0_rgba(17,17,17,0.35)]';
 
   return (
-    <div className="flex gap-3 flex-wrap">
-      <button
-        onClick={handleRestart}
-        className={`flex items-center justify-center gap-2 font-semibold text-sm md:text-base transition-all duration-300 active:translate-y-0.5 ${baseButton} ${showConfirm ? 'bg-pop-lemon dark:bg-pop-coal text-pop-coal dark:text-white animate-gentle-pulse' : 'bg-white dark:bg-clay-900'}`}
-        aria-label={showConfirm ? 'Confirm restart' : 'Restart game'}
-      >
-        <RotateCcw size={18} className={showConfirm ? 'animate-spin' : ''} style={{ animationDuration: showConfirm ? '1s' : undefined }} />
-        <span>{showConfirm ? 'Sure?' : 'Do Over'}</span>
-      </button>
-
-      <button
-        onClick={handleUndo}
-        disabled={!canUndo}
-        className={`flex items-center justify-center gap-2 font-semibold text-sm md:text-base transition-all duration-300 ${baseButton} ${canUndo ? 'bg-pop-sky text-pop-coal dark:text-pop-coal' : 'bg-pop-lilac text-pop-coal/40 dark:text-white/30 cursor-not-allowed'}`}
-        aria-label="Undo last move"
-      >
-        <Undo2 size={18} />
-        <span>Undo</span>
-      </button>
-    </div>
+    <button
+      onClick={handleRestart}
+      className={`h-full ${padding} ${borderRadius} border-2 border-pop-coal dark:border-[#1a1a2e] ${shadow} dark:shadow-[3px_3px_0_rgba(0,0,0,0.3)] flex flex-col items-center justify-center ${gap} font-semibold text-sm transition-all duration-300 active:translate-y-0.5 ${showConfirm ? 'bg-pop-lemon dark:bg-[#FFE156] text-pop-coal dark:text-[#1a1a2e] animate-gentle-pulse' : 'bg-white dark:bg-[#E0BBE4] text-pop-coal dark:text-[#1a1a2e]'}`}
+      aria-label={showConfirm ? 'Confirm restart' : 'Restart game'}
+    >
+      <RotateCcw size={iconSize} className={showConfirm ? 'animate-spin' : ''} style={{ animationDuration: showConfirm ? '1s' : undefined }} />
+      <span className={`${labelSize} font-black uppercase tracking-wider`}>{showConfirm ? 'Sure?' : 'Reset'}</span>
+    </button>
   );
 };

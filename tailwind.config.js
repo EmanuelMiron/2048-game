@@ -61,58 +61,58 @@ export default {
           coal: '#111111',
           ink: '#1f1f1f'
         },
-        // Tile colors with physical depth
+        // Tile colors with physical depth - Witty Pop Modernism pastels
         'tile-empty': {
           light: '#cdc1b4',
-          dark: '#1f1b16'
+          dark: '#2a2a3e'
         },
         'tile-2': {
           light: '#fee4eb',
-          dark: '#46343c'
+          dark: '#FFB4C2' // blush pink
         },
         'tile-4': {
           light: '#fff2d2',
-          dark: '#4f3c31'
+          dark: '#FFF7BE' // lemon cream
         },
         'tile-8': {
           light: '#ffd39b',
-          dark: '#9c4119'
+          dark: '#FFCBA4' // peach
         },
         'tile-16': {
           light: '#ffb66f',
-          dark: '#b84418'
+          dark: '#FF9B8A' // coral
         },
         'tile-32': {
           light: '#ff9a6d',
-          dark: '#a3311a'
+          dark: '#FF7F7F' // pastel red
         },
         'tile-64': {
           light: '#ff7a63',
-          dark: '#8c201a'
+          dark: '#C77DFF' // lavender
         },
         'tile-128': {
           light: '#ffd657',
-          dark: '#a66211'
+          dark: '#FFE156' // buttery yellow
         },
         'tile-256': {
           light: '#ffc946',
-          dark: '#94540e'
+          dark: '#A8E6CF' // mint green
         },
         'tile-512': {
           light: '#ffbf34',
-          dark: '#7d430b'
+          dark: '#87CEEB' // sky blue
         },
         'tile-1024': {
           light: '#ffb31e',
-          dark: '#6a3608'
+          dark: '#B4E7CE' // jade
         },
         'tile-2048': {
           light: '#ffe79c',
-          dark: '#4f2b06'
+          dark: '#FFDAB9' // apricot
         },
         'tile-super': {
           light: '#1d1d1d',
-          dark: '#faf2e1'
+          dark: '#E0BBE4' // dusty purple
         },
       },
       fontFamily: {

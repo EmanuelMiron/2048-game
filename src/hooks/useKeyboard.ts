@@ -4,11 +4,10 @@ import { Direction } from '../types/game';
 interface UseKeyboardProps {
   onMove: (direction: Direction) => boolean;
   onRestart: () => void;
-  onUndo: () => void;
   disabled?: boolean;
 }
 
-export const useKeyboard = ({ onMove, onRestart, onUndo, disabled = false }: UseKeyboardProps) => {
+export const useKeyboard = ({ onMove, onRestart, disabled = false }: UseKeyboardProps) => {
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
     if (disabled) return;
 
@@ -37,15 +36,8 @@ export const useKeyboard = ({ onMove, onRestart, onUndo, disabled = false }: Use
           onRestart();
         }
         break;
-      case 'z':
-      case 'Z':
-        if (event.ctrlKey || event.metaKey) {
-          event.preventDefault();
-          onUndo();
-        }
-        break;
     }
-  }, [onMove, onRestart, onUndo, disabled]);
+  }, [onMove, onRestart, disabled]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);

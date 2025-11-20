@@ -14,12 +14,6 @@ export interface GameState {
   bestScore: number;
   gameStatus: 'playing' | 'won' | 'lost';
   hasWon: boolean;
-  canUndo: boolean;
-}
-
-export interface GameHistory {
-  board: (Tile | null)[][];
-  score: number;
 }
 
 export type Direction = 'up' | 'down' | 'left' | 'right';

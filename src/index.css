@@ -37,28 +37,29 @@
   }
 
   .dark {
-    /* Dark theme with warmth */
-    --bg-primary: #1a1612;
-    --bg-secondary: #2a2622;
-    --bg-surface: #3d3731;
-    --text-primary: #f3efe8;
-    --text-secondary: #d9cfc4;
-    --text-tertiary: #b8ab98;
-    --border-color: #4a4238;
-    --shadow-color: rgba(0, 0, 0, 0.3);
+    /* Dark theme with punchy pastels - Witty Pop Modernism */
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-surface: #0f3460;
+    --text-primary: #ffffff;
+    --text-secondary: #e8e8e8;
+    --text-tertiary: #c4c4c4;
+    --border-color: #2a2a3e;
+    --shadow-color: rgba(0, 0, 0, 0.4);
 
-    --tile-2-foreground: #f6eee4;
-    --tile-4-foreground: #f7efe6;
-    --tile-8-foreground: #fff7ef;
-    --tile-16-foreground: #fff6ec;
-    --tile-32-foreground: #3d1509;
-    --tile-64-foreground: #371306;
-    --tile-128-foreground: #311003;
-    --tile-256-foreground: #2c0e03;
-    --tile-512-foreground: #fff8f0;
-    --tile-1024-foreground: #fffaf4;
-    --tile-2048-foreground: #fffdf8;
-    --tile-super-foreground: #fffefb;
+    /* Punchy, vibrant tile text colors for dark mode */
+    --tile-2-foreground: #1a1a2e;
+    --tile-4-foreground: #1a1a2e;
+    --tile-8-foreground: #1a1a2e;
+    --tile-16-foreground: #ffffff;
+    --tile-32-foreground: #ffffff;
+    --tile-64-foreground: #ffffff;
+    --tile-128-foreground: #1a1a2e;
+    --tile-256-foreground: #1a1a2e;
+    --tile-512-foreground: #1a1a2e;
+    --tile-1024-foreground: #1a1a2e;
+    --tile-2048-foreground: #1a1a2e;
+    --tile-super-foreground: #1a1a2e;
   }
 
   html {

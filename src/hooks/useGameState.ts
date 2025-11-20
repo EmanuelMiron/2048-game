@@ -1,13 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
-import { GameState, GameHistory, Direction, Tile } from '../types/game';
-import { 
-  initializeBoard, 
-  move, 
-  addRandomTile, 
-  canMove, 
+import { GameState, Direction, Tile } from '../types/game';
+import {
+  initializeBoard,
+  move,
+  addRandomTile,
+  canMove,
   canMoveInDirection,
-  hasWon,
-  cloneBoard 
+  hasWon
 } from '../utils/gameLogic';
 
 const STORAGE_KEY = 'game2048';
@@ -28,18 +27,16 @@ export const useGameState = () => {
         // If parsing fails, start new game
       }
     }
-    
+
     return {
       board: initializeBoard(),
       score: 0,
       bestScore: parseInt(localStorage.getItem(BEST_SCORE_KEY) || '0'),
       gameStatus: 'playing' as const,
-      hasWon: false,
-      canUndo: false
+      hasWon: false
     };
   });
 
-  const [history, setHistory] = useState<GameHistory[]>([]);
   const [animatingTiles, setAnimatingTiles] = useState<Tile[]>([]);
   const [scoreIncrease, setScoreIncrease] = useState<number>(0);
 
@@ -49,10 +46,9 @@ export const useGameState = () => {
       board: state.board,
       score: state.score,
       gameStatus: state.gameStatus,
-      hasWon: state.hasWon,
-      canUndo: state.canUndo
+      hasWon: state.hasWon
     }));
-    
+
     if (state.score > state.bestScore) {
       localStorage.setItem(BEST_SCORE_KEY, state.score.toString());
     }
@@ -69,14 +65,8 @@ export const useGameState = () => {
     // Check if the move is valid before attempting it
     if (!canMoveInDirection(gameState.board, direction)) return false;
 
-    // Save current state to history
-    const currentHistory: GameHistory = {
-      board: cloneBoard(gameState.board),
-      score: gameState.score
-    };
-
     const moveResult = move(gameState.board, direction);
-    
+
     // This should always be true now due to pre-validation, but keep as safety check
     if (!moveResult.moved) return false;
 
@@ -88,7 +78,7 @@ export const useGameState = () => {
     // Check game status
     const playerHasWon = hasWon(boardWithNewTile);
     const gameOver = !canMove(boardWithNewTile);
-    
+
     let newGameStatus: 'playing' | 'won' | 'lost' = 'playing';
     if (playerHasWon && !gameState.hasWon) {
       newGameStatus = 'won';
@@ -103,13 +93,9 @@ export const useGameState = () => {
       score: newScore,
       bestScore: newBestScore,
       gameStatus: newGameStatus,
-      hasWon: prev.hasWon || playerHasWon,
-      canUndo: true
+      hasWon: prev.hasWon || playerHasWon
     }));
 
-    // Update history (keep last 1 move for undo)
-    setHistory([currentHistory]);
-    
     // Set animations
     setAnimatingTiles(moveResult.mergedTiles);
     setScoreIncrease(moveResult.scoreIncrease);
@@ -123,33 +109,16 @@ export const useGameState = () => {
     return true;
   }, [gameState]);
 
-  const undoMove = useCallback(() => {
-    if (!gameState.canUndo || history.length === 0) return;
-
-    const lastState = history[0];
-    setGameState(prev => ({
-      ...prev,
-      board: lastState.board,
-      score: lastState.score,
-      gameStatus: 'playing',
-      canUndo: false
-    }));
-
-    setHistory([]);
-  }, [gameState.canUndo, history]);
-
   const restartGame = useCallback(() => {
     const newState: GameState = {
       board: initializeBoard(),
       score: 0,
       bestScore: gameState.bestScore,
       gameStatus: 'playing',
-      hasWon: false,
-      canUndo: false
+      hasWon: false
     };
-    
+
     setGameState(newState);
-    setHistory([]);
     setAnimatingTiles([]);
     setScoreIncrease(0);
   }, [gameState.bestScore]);
@@ -166,7 +135,6 @@ export const useGameState = () => {
   return {
     gameState,
     makeMove,
-    undoMove,
     restartGame,
     continueGame,
     animatingTiles,

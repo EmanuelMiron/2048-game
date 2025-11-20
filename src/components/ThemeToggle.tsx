@@ -1,22 +1,33 @@
 import React from 'react';
 import { useTheme } from '../hooks/useTheme';
 
-export const ThemeToggle: React.FC = () => {
+interface ThemeToggleProps {
+  compact?: boolean;
+}
+
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({ compact = false }) => {
   const { theme, toggleTheme } = useTheme();
+
+  const iconSize = compact ? 'w-4 h-4' : 'w-5 h-5';
+  const labelSize = compact ? 'text-[8px]' : 'text-xs';
+  const gap = compact ? 'gap-0.5' : 'gap-1';
+  const padding = compact ? 'px-2 py-2' : 'px-4';
+  const borderRadius = compact ? 'rounded-xl' : 'rounded-2xl';
+  const shadow = compact ? 'shadow-[3px_3px_0_rgba(17,17,17,0.35)]' : 'shadow-[6px_6px_0_rgba(17,17,17,0.35)]';
+  const minWidth = compact ? 'min-w-[50px]' : 'min-w-[80px]';
 
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center justify-center
-        w-11 h-11 rounded-full border-2 border-pop-coal dark:border-white/80 bg-white dark:bg-clay-900 text-pop-coal dark:text-white shadow-[4px_4px_0_rgba(17,17,17,0.35)]"
+      className={`h-full ${padding} ${borderRadius} border-2 border-pop-coal dark:border-[#1a1a2e] bg-white dark:bg-[#FFDAB9] text-pop-coal dark:text-[#1a1a2e] ${shadow} dark:shadow-[3px_3px_0_rgba(0,0,0,0.3)] flex flex-col items-center justify-center ${gap} transition-all duration-500 active:translate-y-0.5 ${minWidth}`}
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
-      <div className="relative w-5 h-5">
+      <div className={`relative ${iconSize}`}>
         {/* Sun Icon */}
         <svg
           className={`
-            absolute inset-0 w-5 h-5 text-pop-coal dark:text-pop-coal transition-all duration-500 ease-out
+            absolute inset-0 ${iconSize} text-pop-coal dark:text-[#1a1a2e] transition-all duration-500 ease-out
             ${
               theme === "light"
                 ? "opacity-100 rotate-0 scale-100"
@@ -37,7 +48,7 @@ export const ThemeToggle: React.FC = () => {
         {/* Moon Icon */}
         <svg
           className={`
-            absolute inset-0 w-5 h-5 text-sand-300 dark:text-sand-200 transition-all duration-500 ease-out
+            absolute inset-0 ${iconSize} text-[#1a1a2e] dark:text-[#1a1a2e] transition-all duration-500 ease-out
             ${
               theme === "dark"
                 ? "opacity-100 rotate-0 scale-100"
@@ -51,6 +62,7 @@ export const ThemeToggle: React.FC = () => {
           <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
         </svg>
       </div>
+      <span className={`${labelSize} font-black uppercase tracking-wider`}>{theme === 'light' ? 'Light' : 'Dark'}</span>
     </button>
   );
 };
